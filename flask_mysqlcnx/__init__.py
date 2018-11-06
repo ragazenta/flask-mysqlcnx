@@ -1,5 +1,4 @@
-import MySQLdb
-from MySQLdb import cursors
+import mysql.connector
 from flask import _app_ctx_stack, current_app
 
 
@@ -12,12 +11,12 @@ class MySQL(object):
 
     def init_app(self, app):
         """Initialize the `app` for use with this
-        :class:`~flask_mysqldb.MySQL` class.
+        :class:`~flask_mysqlcnx.MySQL` class.
         This is called automatically if `app` is passed to
         :meth:`~MySQL.__init__`.
 
         :param flask.Flask app: the application to configure for use with
-            this :class:`~flask_mysqldb.MySQL` class.
+            this :class:`~flask_mysqlcnx.MySQL` class.
         """
 
         app.config.setdefault('MYSQL_HOST', 'localhost')
@@ -27,11 +26,9 @@ class MySQL(object):
         app.config.setdefault('MYSQL_PORT', 3306)
         app.config.setdefault('MYSQL_UNIX_SOCKET', None)
         app.config.setdefault('MYSQL_CONNECT_TIMEOUT', 10)
-        app.config.setdefault('MYSQL_READ_DEFAULT_FILE', None)
         app.config.setdefault('MYSQL_USE_UNICODE', True)
         app.config.setdefault('MYSQL_CHARSET', 'utf8')
         app.config.setdefault('MYSQL_SQL_MODE', None)
-        app.config.setdefault('MYSQL_CURSORCLASS', None)
 
         if hasattr(app, 'teardown_appcontext'):
             app.teardown_appcontext(self.teardown)
@@ -47,10 +44,10 @@ class MySQL(object):
             kwargs['user'] = current_app.config['MYSQL_USER']
 
         if current_app.config['MYSQL_PASSWORD']:
-            kwargs['passwd'] = current_app.config['MYSQL_PASSWORD']
+            kwargs['password'] = current_app.config['MYSQL_PASSWORD']
 
         if current_app.config['MYSQL_DB']:
-            kwargs['db'] = current_app.config['MYSQL_DB']
+            kwargs['database'] = current_app.config['MYSQL_DB']
 
         if current_app.config['MYSQL_PORT']:
             kwargs['port'] = current_app.config['MYSQL_PORT']
@@ -59,12 +56,8 @@ class MySQL(object):
             kwargs['unix_socket'] = current_app.config['MYSQL_UNIX_SOCKET']
 
         if current_app.config['MYSQL_CONNECT_TIMEOUT']:
-            kwargs['connect_timeout'] = \
+            kwargs['connection_timeout'] = \
                 current_app.config['MYSQL_CONNECT_TIMEOUT']
-
-        if current_app.config['MYSQL_READ_DEFAULT_FILE']:
-            kwargs['read_default_file'] = \
-                current_app.config['MYSQL_READ_DEFAULT_FILE']
 
         if current_app.config['MYSQL_USE_UNICODE']:
             kwargs['use_unicode'] = current_app.config['MYSQL_USE_UNICODE']
@@ -75,10 +68,7 @@ class MySQL(object):
         if current_app.config['MYSQL_SQL_MODE']:
             kwargs['sql_mode'] = current_app.config['MYSQL_SQL_MODE']
 
-        if current_app.config['MYSQL_CURSORCLASS']:
-            kwargs['cursorclass'] = getattr(cursors, current_app.config['MYSQL_CURSORCLASS'])
-
-        return MySQLdb.connect(**kwargs)
+        return mysql.connector.connect(**kwargs)
 
     @property
     def connection(self):
@@ -90,11 +80,11 @@ class MySQL(object):
 
         ctx = _app_ctx_stack.top
         if ctx is not None:
-            if not hasattr(ctx, 'mysql_db'):
-                ctx.mysql_db = self.connect
-            return ctx.mysql_db
+            if not hasattr(ctx, 'mysql_cnx'):
+                ctx.mysql_cnx = self.connect
+            return ctx.mysql_cnx
 
     def teardown(self, exception):
         ctx = _app_ctx_stack.top
-        if hasattr(ctx, 'mysql_db'):
-            ctx.mysql_db.close()
+        if hasattr(ctx, 'mysql_cnx'):
+            ctx.mysql_cnx.close()

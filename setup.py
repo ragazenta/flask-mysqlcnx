@@ -1,28 +1,30 @@
 """
-Flask-MySQLdb
+Flask-MySQL-Connector
 ----------------
 
-MySQLdb extension for Flask
+MySQL Connector extension for Flask
 """
 from setuptools import setup
 
 
 setup(
-    name='Flask-MySQLdb',
-    version='0.2.0',
-    url='https://github.com/admiralobvious/flask-mysqldb',
+    name='Flask-MySQL-Connector',
+    version='0.1.0',
+    url='https://github.com/ragazenta/flask-mysqlcnx',
     license='MIT',
     author='Alexandre Ferland',
     author_email='aferlandqc@gmail.com',
-    description='MySQLdb extension for Flask',
+    maintainer='Renjaya Raga Zenta',
+    maintainer_email='ragazenta@gmail.com',
+    description='MySQL Connector extension for Flask',
     long_description=__doc__,
-    packages=['flask_mysqldb'],
+    packages=['flask_mysqlcnx'],
     zip_safe=False,
     include_package_data=True,
     platforms='any',
     install_requires=[
         'Flask>=0.10.1',
-        'mysqlclient'
+        'mysql-connector-python'
     ],
     classifiers=[
         'Environment :: Web Environment',
